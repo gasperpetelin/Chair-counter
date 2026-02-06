@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install uv
+      run: make install-uv
+
+    - name: Setup environment
+      run: make setup
+
+    - name: Run test cases
+      run: |
+        for case_file in cases/*; do
+          echo "========================================="
+          echo "Running case: $case_file"
+          echo "========================================="
+          cat "$case_file"
+          echo ""
+          echo "Output:"
+          uv run python main.py "$case_file"
+          echo ""
+        done
