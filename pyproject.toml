@@ -9,3 +9,8 @@ dependencies = [
     "scipy",
     "click",
 ]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+]

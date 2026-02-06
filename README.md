@@ -13,7 +13,6 @@ make setup        # install dependencies
 
 ```bash
 uv run python main.py <floor_plan.txt>
-uv run python main.py <floor_plan.txt> --debug
 ```
 
 ## Solution

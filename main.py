@@ -121,45 +121,53 @@ def format_counts(counts: dict[str, int]) -> str:
     return ", ".join(f"{ch}: {counts[ch]}" for ch in CHAIR_TYPES)
 
 
-def print_debug(walkable: np.ndarray, labels: np.ndarray) -> None:
-    """Print intermediate arrays for debugging."""
-    print("Walkable areas (1 = walkable, 0 = wall):")
-    for row in walkable.astype(int):
-        print("".join(str(x) for x in row))
-    print()
-    print("Labeled regions:")
-    for row in labels:
-        print("".join(str(x) for x in row))
-    print()
+def format_output(total: dict[str, int], room_counts: dict[str, dict[str, int]]) -> str:
+    """Format the complete output string.
+
+    Args:
+        total: Total chair counts across all rooms.
+        room_counts: Dictionary mapping room names to their chair counts.
+
+    Returns:
+        Formatted output string ready to print.
+    """
+    lines = ["total:", format_counts(total)]
+    for name in sorted(room_counts.keys()):
+        lines.append(f"{name}:")
+        lines.append(format_counts(room_counts[name]))
+    return "\n".join(lines)
+
+
+def process_floor_plan(grid: np.ndarray) -> str:
+    """Process a floor plan grid and return formatted output string.
+
+    Args:
+        grid: 2D numpy array of characters representing the floor plan.
+
+    Returns:
+        Formatted output string with chair counts.
+    """
+    rooms = find_rooms(grid)
+    walkable = np.isin(grid, list(WALL_CHARS), invert=True)
+
+    # Use scipy's efficient connected component labeling
+    # Alternative: use custom BFS implementation with label_rooms(walkable, rooms)
+    labels, _ = scipy_label(walkable, structure=[[0, 1, 0], [1, 1, 1], [0, 1, 0]])
+
+    total, room_counts = count_chairs(grid, labels, rooms)
+    return format_output(total, room_counts)
 
 
 @click.command()
 @click.argument("file", type=click.Path(exists=True))
-@click.option("--debug", is_flag=True, help="Print intermediate debug states")
-def main(file: str, debug: bool) -> None:
+def main(file: str) -> None:
     """Count chairs per room in an apartment floor plan.
 
     FILE: Path to a floor plan text file.
     """
     room_array = parse_floor_plan(file)
-    rooms = find_rooms(room_array)
-    walkable = np.isin(room_array, list(WALL_CHARS), invert=True)
-
-    # scipy's efficient flood fill implementation
-    # For completeness, I also implemented my own version:
-    # labels = label_rooms(walkable, rooms)
-    labels, _ = scipy_label(walkable, structure=[[0, 1, 0], [1, 1, 1], [0, 1, 0]])
-
-    if debug:
-        print_debug(walkable, labels)
-
-    total, room_counts = count_chairs(room_array, labels, rooms)
-
-    print("total:")
-    print(format_counts(total))
-    for name in sorted(room_counts.keys()):
-        print(f"{name}:")
-        print(format_counts(room_counts[name]))
+    output = process_floor_plan(room_array)
+    print(output)
 
 
 if __name__ == "__main__":
