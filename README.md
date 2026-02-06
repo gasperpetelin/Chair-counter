@@ -2,6 +2,8 @@
 
 A command-line tool that reads apartment floor plans from text files and counts different types of chairs (W, P, S, C) per room.
 
+> **Note:** See the tool in action under GitHub Actions CI/CD pipeline. No need to run/check localy.
+
 ## Installation
 
 ```bash
@@ -17,11 +19,11 @@ uv run python main.py <floor_plan.txt>
 
 ## Solution
 
-The floor plan is read into a 2D NumPy character array. Walls (`+`, `-`, `|`, `/`) are identified and a boolean walkable mask is created by inverting wall positions.
+The floor plan is parsed into a 2D NumPy character array. Walls (`+`, `-`, `|`, `/`) are identified and a boolean walkable mask is created.
 
-Room names are extracted by searching for `(name)` patterns using regex. Connected room regions are labeled using `scipy.ndimage.label` with 4-connectivity (up, down, left, right -- no diagonals). For each room, the label at the room name's position determines which cells belong to it. Chair characters are then counted per region.
+Room names are extracted using regex to find `(name)` patterns. Connected regions are labeled with `scipy.ndimage.label`. Each room's region is identified by the label at its name position, then chairs are counted per region.
 
-A custom BFS flood fill implementation is also included as an alternative to scipy's labeling.
+**Note:** To demonstrate understanding of the underlying algorithm and avoid over-reliance on image processing libraries, a custom BFS flood fill implementation (`label_rooms`) is also included as an alternative to scipy's labeling.
 
 ## Instruction
 
