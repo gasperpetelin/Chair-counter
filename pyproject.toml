@@ -1,0 +1,11 @@
+[project]
+name = "floor-plan-chair-counter"
+version = "0.1.0"
+description = "A command-line tool that counts chairs per room in apartment floor plans"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy",
+    "scipy",
+    "click",
+]
