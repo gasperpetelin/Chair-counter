@@ -19,7 +19,22 @@ jobs:
     - name: Setup environment
       run: make setup
 
-    - name: Run test cases
+    - name: Run unit tests
+      run: make tests
+
+  execute-cases:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install uv
+      run: make install-uv
+
+    - name: Setup environment
+      run: make setup
+
+    - name: Execute test cases
       run: |
         for case_file in cases/*; do
           echo "========================================="
